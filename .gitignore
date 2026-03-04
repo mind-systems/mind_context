@@ -1,0 +1,29 @@
+# Project subdirectories (separate repos)
+mind_api/
+mind_mobile/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Misc
+*.tmp
+*.bak

@@ -14,16 +14,16 @@ Fix a specific bug or problem in the codebase. Supports two modes: immediate fix
 
 ### Step 0: Check for Existing Fix Plan
 
-**BEFORE anything else**, check if `.ai-factory/FIX_PLAN.md` exists.
+**BEFORE anything else**, check if `<FIX_ROOT>/FIX_PLAN.md` exists.
 
 **If the file EXISTS:**
-- Read `.ai-factory/FIX_PLAN.md`
+- Read `<FIX_ROOT>/FIX_PLAN.md`
 - Inform the user: "Found existing fix plan. Executing fix based on the plan."
 - **Skip Steps 0.1 through 1** — go directly to **Step 2: Investigate the Codebase**, using the plan as your guide
 - Follow each step of the plan sequentially
-- After the fix is fully applied and verified, **delete** `.ai-factory/FIX_PLAN.md`:
+- After the fix is fully applied and verified, **delete** `<FIX_ROOT>/FIX_PLAN.md`:
   ```bash
-  rm .ai-factory/FIX_PLAN.md
+  rm <FIX_ROOT>/FIX_PLAN.md
   ```
 - Continue to Step 4 (Verify), Step 5 (Test suggestion), Step 6 (Patch)
 
@@ -34,15 +34,37 @@ Fix a specific bug or problem in the codebase. Supports two modes: immediate fix
 **If the file DOES NOT exist AND `$ARGUMENTS` is provided:**
 - Continue to Step 0.1 below.
 
-### Step 0.1: Load Project Context & Past Experience
+### Step 0.1: Detect Sub-project Scope
+
+This repository is a **monorepo**. Fix plans and patches must live next to the code they describe.
+
+**Detection rules (in order):**
+
+1. **Explicit sub-project prefix in description** — if the description mentions `mind_api` or `mind_mobile` by name, use that sub-project.
+2. **Technology/domain keywords** — infer from the description:
+   - NestJS, TypeORM, PostgreSQL, Swagger, Passport, Makefile, Docker → `mind_api/`
+   - Flutter, Dart, Drift, Riverpod, widget, screen, GoRouter, Dio → `mind_mobile/`
+3. **Cross-project or unclear** → use root `.ai-factory/`
+
+**Set `FIX_ROOT` based on detection:**
+
+```
+mind_api task    → FIX_ROOT = mind_api/.ai-factory
+mind_mobile task → FIX_ROOT = mind_mobile/.ai-factory
+cross-project    → FIX_ROOT = .ai-factory
+```
+
+Use `FIX_ROOT` for all `FIX_PLAN.md` and `patches/` paths below.
+
+### Step 0.2: Load Project Context & Past Experience
 
 **Read `.ai-factory/DESCRIPTION.md`** if it exists to understand:
 - Tech stack (language, framework, database)
 - Project architecture
 - Coding conventions
 
-**Read all patches from `.ai-factory/patches/`** if the directory exists:
-- Use `Glob` to find all `*.md` files in `.ai-factory/patches/`
+**Read all patches from `<FIX_ROOT>/patches/`** if the directory exists:
+- Use `Glob` to find all `*.md` files in `<FIX_ROOT>/patches/`
 - Read each patch file to learn from past fixes
 - Pay attention to recurring patterns, root causes, and solutions
 - If the current problem resembles a past patch — apply the same approach or avoid the same mistakes
@@ -90,7 +112,7 @@ After agents return, synthesize findings to:
 2. Map affected files and functions
 3. Assess impact scope
 
-Then create `.ai-factory/FIX_PLAN.md` with this structure:
+Then create `<FIX_ROOT>/FIX_PLAN.md` with this structure:
 
 ```markdown
 # Fix Plan: [Brief title]
@@ -135,7 +157,7 @@ Step-by-step plan for implementing the fix:
 ```
 ## Fix Plan Created ✅
 
-Plan saved to `.ai-factory/FIX_PLAN.md`.
+Plan saved to `<FIX_ROOT>/FIX_PLAN.md`.
 
 Review the plan and when you're ready to execute, run:
 
@@ -355,7 +377,7 @@ To add the suggested test:
 
 1. Create directory if it doesn't exist:
    ```bash
-   mkdir -p .ai-factory/patches
+   mkdir -p <FIX_ROOT>/patches
    ```
 
 2. Create a patch file with the current timestamp as filename.

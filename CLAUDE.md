@@ -13,6 +13,16 @@ This is a monorepo containing two independent projects, each with its own `CLAUD
 
 Read each sub-project's `CLAUDE.md` before working within it.
 
+## This repo is the orchestrator
+
+The root of this repo is a **coordination layer** — it holds cross-project plans, roadmaps, AI context (`.ai-factory/`), and skills (`.claude/`). It does not contain runnable application code itself.
+
+- Work scoped to the backend only → operate inside `mind_api/`, plans go to `mind_api/.ai-factory/`
+- Work scoped to the mobile app only → operate inside `mind_mobile/`, plans go to `mind_mobile/.ai-factory/`
+- Cross-project or architectural work → use the root `.ai-factory/`
+
+AI skills (`aif-plan`, `aif-fix`, `aif-verify`) detect sub-project scope from task descriptions and route plan/fix files accordingly.
+
 ## Cross-project coordination
 
 When a task requires changes in **both** projects:

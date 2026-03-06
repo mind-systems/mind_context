@@ -2,11 +2,11 @@
 
 ## Overview
 
-Mind is a wellness/breathing app consisting of a NestJS REST API backend and a Flutter mobile app (iOS/Android). Users authenticate via Firebase, perform guided breathing sessions, and the app persists session history both locally (Drift) and remotely (PostgreSQL).
+Mind is a wellness/breathing app consisting of a NestJS REST API backend and a Flutter mobile app (iOS/Android). Users authenticate via passwordless email (one-time code), perform guided breathing sessions, and the app persists session history both locally (Drift) and remotely (PostgreSQL).
 
 ## Core Features
 
-- Firebase-based authentication with JWT session management
+- Passwordless email authentication (one-time code) with JWT session management
 - Guided breathing sessions with animated UI (shape morphing, physics-based motion)
 - Breathing session history — CRUD, pagination, local cache + remote sync
 - Offline-first: Drift (SQLite) local DB, synced to API on reconnect
@@ -18,7 +18,7 @@ Mind is a wellness/breathing app consisting of a NestJS REST API backend and a F
 - **Framework:** NestJS
 - **Database:** PostgreSQL
 - **ORM:** TypeORM (migrations-based, synchronize: false)
-- **Auth:** Firebase Admin SDK (ID Token) + Passport JWT (access token) with JWT blacklist
+- **Auth:** Passwordless email + one-time code, Passport JWT (access token), JWT blacklist (PostgreSQL, purged nightly via cron)
 - **Infra:** Docker (dev + prod), Makefile
 
 ### Mobile (`mind_mobile/`)
@@ -33,7 +33,7 @@ Mind is a wellness/breathing app consisting of a NestJS REST API backend and a F
 ## Architecture Notes
 
 ### Backend
-Modular Monolith. Each domain (auth, breath-sessions, firebase) is a self-contained NestJS feature module. Two-guard auth: `FirebaseAuthGuard` on `/auth/login`, `JwtAuthGuard` everywhere else. Controllers are thin — all logic in services.
+Modular Monolith. Each domain (auth, breath-sessions, mail) is a self-contained NestJS feature module. Single-guard auth: `JwtAuthGuard` on all protected routes. Passwordless flow: user requests code → receives email → exchanges code for JWT. Controllers are thin — all logic in services.
 
 ### Mobile
 Layered architecture: Repository → Notifier (domain) → Service → ViewModel → Screen + Coordinator. ViewModel is the module boundary; domain models never leak into presentation. DI is manual via `App.shared` singleton.
@@ -48,4 +48,4 @@ Layered architecture: Repository → Notifier (domain) → Service → ViewModel
 
 - Logging: NestJS built-in logger, configurable
 - Error handling: Structured HTTP errors on API, typed domain events on mobile
-- Security: JWT blacklist (PostgreSQL), Firebase token verification, HTTPS
+- Security: JWT blacklist (PostgreSQL), HTTPS

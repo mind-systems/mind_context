@@ -23,6 +23,10 @@ The root of this repo is a **coordination layer** — it holds cross-project pla
 
 AI skills (`aif-plan`, `aif-fix`, `aif-verify`) detect sub-project scope from task descriptions and route plan/fix files accordingly.
 
+## Language
+
+**All files must be written in English** — plans, roadmaps, DESCRIPTION.md, ARCHITECTURE.md, and any other generated or edited files. This applies regardless of the language used in conversation.
+
 ## Cross-project coordination
 
 When a task requires changes in **both** projects:

@@ -28,7 +28,7 @@ Mind is a wellness/breathing app consisting of a NestJS REST API backend and a F
 - **State:** Riverpod (presentation) + RxDart BehaviorSubject (domain)
 - **Navigation:** GoRouter
 - **HTTP:** Dio + AuthInterceptor
-- **Flavors:** dev / prod (separate Firebase projects)
+- **Flavors:** dev / prod
 
 ## Architecture Notes
 

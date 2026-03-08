@@ -30,16 +30,17 @@ This repository is a **monorepo**. Plans live in the sub-project that owns the c
 **Step 1 — detect `PLAN_ROOT`** by searching for plan files in order:
 
 ```bash
-# Check for fast-mode plans (PLAN.md)
-mind_api/.ai-factory/PLAN.md      → PLAN_ROOT = mind_api/.ai-factory
-mind_mobile/.ai-factory/PLAN.md   → PLAN_ROOT = mind_mobile/.ai-factory
-.ai-factory/PLAN.md               → PLAN_ROOT = .ai-factory
-
-# If no PLAN.md, check branch-named plans:
 BRANCH=$(git branch --show-current)
+
+# Check branch-named plans first:
 mind_api/.ai-factory/plans/<branch>.md      → PLAN_ROOT = mind_api/.ai-factory
 mind_mobile/.ai-factory/plans/<branch>.md   → PLAN_ROOT = mind_mobile/.ai-factory
 .ai-factory/plans/<branch>.md              → PLAN_ROOT = .ai-factory
+
+# No branch-named file → pick most recently modified in each plans/:
+mind_api/.ai-factory/plans/*.md      → PLAN_ROOT = mind_api/.ai-factory
+mind_mobile/.ai-factory/plans/*.md   → PLAN_ROOT = mind_mobile/.ai-factory
+.ai-factory/plans/*.md               → PLAN_ROOT = .ai-factory
 ```
 
 Use whichever path resolves first. Store as `PLAN_ROOT`.

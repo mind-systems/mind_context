@@ -17,12 +17,16 @@
 - [x] **Theme & Language UI** — Profile screen wired end-to-end: theme picker + language picker, reactive `MyApp` (ThemeMode + Locale)
 - [x] **Language Server Sync** — language synced to server on login (server wins) and on preference change when authenticated
 - [x] **App Localization** — translate all existing UI screens to supported languages (intl + ARB files); no new screens, just existing content
-- [ ] **Localized Transactional Emails** — OTP emails sent in the user's language; supported locales defined server-side
-- [ ] **Locale Analytics** — track raw requested locales on registration with a counter to prioritize new localizations (этот пункт надо переделать на https://github.com/mind-systems/mind_api/issues/26)
-- [ ] **Breath Session Complexity** — develop formulae for exercise complexity calculation and integrate
+- [x] **Localized Transactional Emails** — OTP emails sent in the user's language; supported locales defined server-side
+- [x] **Device Statistics** — `POST /device/ping` on every cold start; collect `installation_id`, platform, OS version, locale, timezone, screen info, app version; track unique installs and `last_seen_at` independent of auth (mind-systems/mind_api#26)
+- [x] **Exercise Editing** — allow users to edit existing breathing exercises (name, phases, settings)
+- [x] **Exercise Starring** — ability to star exercises so they appear in 'Starred' section of breath sessions list
+- [x] **Session Sort Order** — fix seed script to insert sessions in reverse order (complex→simple) so simple sessions get newer `createdAt` timestamps and appear first; add `createdAt` to client domain model, API parsing, Drift schema, and use it for client-side sort within each list section (My / Starred / Shared) to match server order
+- [x] **Public Session Sharing** — share breathing exercises via deep link
+- [x] **Breath Session Complexity** — develop formulae for exercise complexity calculation and integrate
+- [x] **JWT Session Management** — replace JWT blacklist with a `user_sessions` table (allow-list); store SHA-256 hash of the token (not raw JWT); no `expires_at` — session lives until explicitly deleted; login creates a row, logout deletes it; guard looks up hash on every request; client stores JWT encrypted on-device
 - [ ] **Session Statistics & Progress** — per-user breathing stats, streaks, progress tracking
 - [ ] **Push Notifications** — session reminders, streak alerts
-- [ ] **Public Session Sharing** — share breathing exercises via deep link
 
 ## Completed
 
@@ -41,3 +45,12 @@
 | Theme & Language UI | 2026-03-09 |
 | Language Server Sync | 2026-03-12 |
 | App Localization | 2026-03-12 |
+| Localized Transactional Emails | 2026-03-12 |
+| Device Statistics | 2026-03-12 |
+| Exercise Editing | 2026-03-12 |
+| Exercise Starring (API) | 2026-03-12 |
+| Exercise Starring (mobile) | 2026-03-13 |
+| Session Sort Order | 2026-03-13 |
+| Public Session Sharing | 2026-03-13 |
+| Breath Session Complexity | 2026-03-13 |
+| JWT Session Management | 2026-03-13 |

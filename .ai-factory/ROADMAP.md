@@ -25,7 +25,15 @@
 - [x] **Public Session Sharing** — share breathing exercises via deep link
 - [x] **Breath Session Complexity** — develop formulae for exercise complexity calculation and integrate
 - [x] **JWT Session Management** — replace JWT blacklist with a `user_sessions` table (allow-list); store SHA-256 hash of the token (not raw JWT); no `expires_at` — session lives until explicitly deleted; login creates a row, logout deletes it; guard looks up hash on every request; client stores JWT encrypted on-device
-- [ ] **Session Statistics & Progress** — per-user breathing stats, streaks, progress tracking
+- [x] **Realtime Socket Foundation** — persistent Socket.IO channel (one per user, lives for the app lifetime); JWT auth on handshake; ActivityEngine (start/pause/resume/end/abandon LiveSession); StateStore (in-memory socket + activity maps); server restart recovery; versioned message protocol; engine telemetry (breath phase instruction log); activity pause/resume
+  - [x] API: Phases A–H complete (gateway, live session engine, stream engine, stats service)
+  - [x] API: Activity pause/resume + telemetry lifecycle markers
+  - [x] Mobile I-1: Transport layer (LiveSocketService, SocketConnectionCoordinator)
+  - [x] Mobile I-2: Reconnect (exponential backoff, connectivity detection)
+  - [x] Mobile I-3: Activity Integration (LiveSessionNotifier, ILiveSessionService, BreathSessionViewModel)
+  - [x] Mobile I-4: Engine Telemetry (TelemetryBuffer, TelemetryService, phase streaming)
+  - [x] Mobile I-5: Activity pause/resume wired end-to-end
+- [ ] **Session Statistics & Progress** — per-user breathing stats, streaks, progress tracking; built on top of the realtime foundation
 - [ ] **Push Notifications** — session reminders, streak alerts
 
 ## Completed
@@ -54,3 +62,4 @@
 | Public Session Sharing | 2026-03-13 |
 | Breath Session Complexity | 2026-03-13 |
 | JWT Session Management | 2026-03-13 |
+| Realtime Socket Foundation | 2026-03-15 |

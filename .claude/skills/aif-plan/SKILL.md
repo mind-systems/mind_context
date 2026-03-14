@@ -126,7 +126,11 @@ Use `TaskUpdate` to set `blockedBy` relationships.
 
 ### Step 5: Save Plan to File
 
-Save to `<PLAN_ROOT>/plans/<slug>.md` where slug is derived from the description (lowercase, hyphens).
+Save to `<PLAN_ROOT>/plans/<NN>-<slug>.md` where:
+- `<slug>` is derived from the description (lowercase, hyphens)
+- `<NN>` is a zero-padded two-digit sequence number (`01`, `02`, `03` …)
+
+To determine `<NN>`, find the highest existing `NN` prefix among files matching `[0-9][0-9]-*.md` in `<PLAN_ROOT>/plans/` and add 1. If no numbered files exist yet, start at `01`.
 
 ```bash
 mkdir -p <PLAN_ROOT>/plans
@@ -143,7 +147,7 @@ Use the template in `references/TASK-FORMAT.md`.
 
 ```
 Plan created with [N] tasks.
-Plan file: <PLAN_ROOT>/plans/<slug>.md
+Plan file: <PLAN_ROOT>/plans/<NN>-<slug>.md
 
 To start implementation:
 /aif-implement
@@ -180,7 +184,7 @@ See `references/TASK-FORMAT.md` for examples.
 4. **Right granularity** — not too big, not too small
 5. **Dependencies matter** — sequential ordering
 6. **Include file paths**
-7. **Plan file location** — always `<PLAN_ROOT>/plans/<slug>.md`
+7. **Plan file location** — always `<PLAN_ROOT>/plans/<NN>-<slug>.md` with zero-padded sequence number
 
 ## Plan File Handling
 

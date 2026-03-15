@@ -286,8 +286,24 @@ Would you like me to create this test?
 4. **Log errors**: Full context if something fails
 5. **Configurable**: Use LOG_LEVEL if available
 
+**NestJS projects: use `new Logger(ClassName.name)`, not `console.log`.** Winston is configured with daily rotation and structured formatting — `console.log` output bypasses the log pipeline and won't appear in log files.
+
 ```typescript
-// Pattern for fixes
+// NestJS pattern (mind_api)
+@Injectable()
+export class MyService {
+  private readonly logger = new Logger(MyService.name);
+
+  fixedMethod(input: SomeType) {
+    this.logger.debug('[FIX] Input', { input });
+    // ... fix logic ...
+    this.logger.log('[FIX] Success', { result });
+  }
+}
+```
+
+```typescript
+// Generic pattern (non-NestJS)
 const LOG_FIX = process.env.LOG_LEVEL === 'debug' || process.env.DEBUG_FIX;
 
 function fixedFunction(input) {

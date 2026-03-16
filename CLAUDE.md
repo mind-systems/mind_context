@@ -4,12 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository structure
 
-This is a monorepo containing two independent projects, each with its own `CLAUDE.md`:
+This root repo is a coordination layer. `mind_api/` and `mind_mobile/` are **separate git repositories** (each has its own `.git` directory) that live inside it as subdirectories.
 
 | Directory | Stack | Purpose |
 |-----------|-------|---------|
-| `mind_api/` | NestJS + TypeORM + PostgreSQL | Backend REST API |
-| `mind_mobile/` | Flutter + Riverpod + Drift | iOS/Android mobile app |
+| `mind_api/` | NestJS + TypeORM + PostgreSQL | Backend REST API — separate git repo |
+| `mind_mobile/` | Flutter + Riverpod + Drift | iOS/Android mobile app — separate git repo |
+
+**Git operations** (status, diff, commit, branch) must be run inside the respective subdirectory, not from the root. The root repo has no visibility into changes inside `mind_api/` or `mind_mobile/`.
 
 Read each sub-project's `CLAUDE.md` before working within it.
 

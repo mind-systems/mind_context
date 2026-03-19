@@ -19,11 +19,50 @@ Read each sub-project's `CLAUDE.md` before working within it.
 
 The root of this repo is a **coordination layer** — it holds cross-project plans, roadmaps, AI context (`.ai-factory/`), and skills (`.claude/`). It does not contain runnable application code itself.
 
+## Scope routing
+
 - Work scoped to the backend only → operate inside `mind_api/`, plans go to `mind_api/.ai-factory/`
 - Work scoped to the mobile app only → operate inside `mind_mobile/`, plans go to `mind_mobile/.ai-factory/`
+- Work scoped to MCP server → operate inside `mind_mcp/`, plans go to `mind_mcp/.ai-factory/`
 - Cross-project or architectural work → use the root `.ai-factory/`
 
-AI skills (`aif-plan`, `aif-fix`, `aif-verify`) detect sub-project scope from task descriptions and route plan/fix files accordingly.
+### `/aif-plan` routing rules
+
+When `/aif-plan` is run, first check the current working directory:
+
+- **CWD is inside a sub-project** (`mind_api/`, `mind_mobile/`, `mind_mcp/`) → save plan to `.ai-factory/plans/` relative to CWD. No detection needed.
+- **CWD is the monorepo root** → detect target sub-project from the task description:
+
+| Keywords in description | Target | Plan path |
+|---|---|---|
+| NestJS, TypeORM, PostgreSQL, Swagger, Passport, migration, endpoint, controller, service | `mind_api` | `mind_api/.ai-factory/plans/` |
+| Flutter, Dart, Drift, Riverpod, widget, screen, GoRouter, Dio | `mind_mobile` | `mind_mobile/.ai-factory/plans/` |
+| MCP, tool, stdio, classify, PAT, personal access token (server context) | `mind_mcp` | `mind_mcp/.ai-factory/plans/` |
+| architecture, roadmap, cross-project, or ambiguous | root | `.ai-factory/plans/` |
+
+If detection is ambiguous, ask:
+```
+Which sub-project is this plan for?
+1. mind_api (NestJS backend)
+2. mind_mobile (Flutter app)
+3. mind_mcp (MCP server)
+4. Root / cross-project
+```
+
+### `/aif-roadmap` routing rules
+
+Default: works relative to CWD — no detection needed when already inside a sub-project.
+
+When run from the monorepo root, or when the user explicitly names a sub-project in the argument (e.g. `/aif-roadmap api` or `/aif-roadmap api check`):
+
+| Argument prefix | Target |
+|---|---|
+| `api` | `mind_api/.ai-factory/ROADMAP.md` |
+| `mobile` | `mind_mobile/.ai-factory/ROADMAP.md` |
+| `mcp` | `mind_mcp/.ai-factory/ROADMAP.md` |
+| no prefix / `check` / vision text | `.ai-factory/ROADMAP.md` relative to CWD |
+
+Strip the sub-project prefix before processing the remaining argument (e.g. `api check` → mode `check` for api).
 
 ## Language
 

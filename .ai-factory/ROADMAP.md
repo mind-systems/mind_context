@@ -34,7 +34,7 @@
   - [x] Mobile I-4: Engine Telemetry (TelemetryBuffer, TelemetryService, phase streaming)
   - [x] Mobile I-5: Activity pause/resume wired end-to-end
 - [x] **Session Statistics & Progress** — per-user breathing stats, streaks, progress tracking; built on top of the realtime foundation
-- [ ] **Personal Access Tokens** `[API]` — create/revoke long-lived tokens for CLI/MCP access; `personal_access_tokens` table (hashed); accepted by JwtAuthGuard alongside regular JWTs; endpoints: `POST /auth/tokens`, `GET /auth/tokens`, `DELETE /auth/tokens/:id`
+- [ ] **Personal Access Tokens** `[API]` — create/revoke long-lived tokens for CLI/MCP access; `personal_access_tokens` table (hashed); accepted by JwtAuthGuard alongside regular JWTs; token format uses `pat_` prefix so the guard can distinguish PATs from JWTs without attempting JWT verification first; `POST /auth/tokens` generates a random secret, stores SHA-256 hash, returns the raw value once; endpoints: `POST /auth/tokens`, `GET /auth/tokens`, `DELETE /auth/tokens/:id`
 - [ ] **Exercise Time-of-Day Field** `[API]` — add nullable `timeOfDay` enum column (`morning | midday | evening`) to `breath_sessions`; migration, entity, DTOs, seed values
 - [ ] **Suggestions Endpoint** `[API]` — `GET /breath_sessions/suggestions?timeOfDay=X`; returns random 3–4 of the user's sessions matching the requested time slot; client always sends morning/midday/evening (night maps to morning on the client side)
 - [ ] **Mind MCP Server — Core** `[MCP]` — standalone TypeScript MCP package (`mind_mcp/`); stdio transport; env-based auth (`MIND_API_URL` + `MIND_JWT_TOKEN`); tool: `list_my_breath_sessions`

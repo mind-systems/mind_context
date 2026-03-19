@@ -27,16 +27,15 @@ enhanced plan with better tasks, correct dependencies, more detail
 **Locate the active plan file using this priority:**
 
 ```
-1. Check current git branch:
+1. .ai-factory/PLAN.md exists? → Use it (from /aif-plan fast)
+2. No .ai-factory/PLAN.md → Check current git branch:
    git branch --show-current
    → Convert branch name to filename: replace "/" with "-", add ".md"
    → Look for .ai-factory/plans/<branch-name>.md
    Example: feature/user-auth → .ai-factory/plans/feature-user-auth.md
-
-2. No branch-named file → List .ai-factory/plans/*.md and pick the most recently modified one.
 ```
 
-**If NO plan file found:**
+**If NO plan file found at either location:**
 
 ```
 No active plan found.
@@ -338,7 +337,7 @@ Apply? → Yes → Changes applied
 ```
 User: /aif-improve добавь обработку ошибок и валидацию входных данных
 
-→ Found plan: .ai-factory/plans/fix-input-validation.md
+→ Found plan: .ai-factory/PLAN.md
 → 4 tasks in plan
 → User wants: error handling + input validation
 → Analyzing each task for missing error handling...
@@ -358,7 +357,7 @@ Apply? → Yes → Changes applied
 ```
 User: /aif-improve
 
-→ No plan files in .ai-factory/plans/
+→ No .ai-factory/PLAN.md found
 → Branch: main (no feature branch)
 → No plan file found
 

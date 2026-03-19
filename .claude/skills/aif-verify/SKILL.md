@@ -23,27 +23,16 @@ Verify that the completed implementation matches the plan, nothing was missed, a
 
 ## Step 0: Load Context
 
-### 0.1 Detect Sub-project Scope & Find Plan File
+### 0.1 Find Plan File
 
-This repository is a **monorepo**. Plans live in the sub-project that owns the code.
+Same logic as `/aif-implement`:
 
-**Step 1 — detect `PLAN_ROOT`** by searching for plan files in order:
-
-```bash
-BRANCH=$(git branch --show-current)
-
-# Check branch-named plans first:
-mind_api/.ai-factory/plans/<branch>.md      → PLAN_ROOT = mind_api/.ai-factory
-mind_mobile/.ai-factory/plans/<branch>.md   → PLAN_ROOT = mind_mobile/.ai-factory
-.ai-factory/plans/<branch>.md              → PLAN_ROOT = .ai-factory
-
-# No branch-named file → pick most recently modified in each plans/:
-mind_api/.ai-factory/plans/*.md      → PLAN_ROOT = mind_api/.ai-factory
-mind_mobile/.ai-factory/plans/*.md   → PLAN_ROOT = mind_mobile/.ai-factory
-.ai-factory/plans/*.md               → PLAN_ROOT = .ai-factory
 ```
-
-Use whichever path resolves first. Store as `PLAN_ROOT`.
+1. .ai-factory/PLAN.md exists? → Use it
+2. No PLAN.md → Check current git branch:
+   git branch --show-current
+   → Look for .ai-factory/plans/<branch-name>.md
+```
 
 If no plan file found:
 ```
@@ -125,36 +114,22 @@ Statuses:
 
 ### 2.1 Build & Compile Check
 
-Use `PLAN_ROOT` to determine which sub-project to build:
-
-| PLAN_ROOT | Build command |
-|-----------|---------------|
-| `mind_api/.ai-factory` | `cd mind_api && npx tsc --noEmit` |
-| `mind_mobile/.ai-factory` | `cd mind_mobile && flutter build apk --flavor dev -t lib/main_dev.dart --debug 2>&1 \| head -50` |
-| `.ai-factory` (root/cross) | Run both commands above |
-
-Fallback for generic projects:
+Detect the build system and verify the project compiles:
 
 | Detection | Command |
 |-----------|---------|
 | `go.mod` | `go build ./...` |
 | `tsconfig.json` | `npx tsc --noEmit` |
-| `package.json` with `build` script | `npm run build` |
+| `package.json` with `build` script | `npm run build` (or pnpm/yarn/bun) |
+| `pyproject.toml` | `python -m py_compile` on changed files |
 | `Cargo.toml` | `cargo check` |
+| `composer.json` | `composer validate` |
 
 If build fails → report errors with file:line references.
 
 ### 2.2 Test Check
 
 If the project has tests and they were part of the plan:
-
-| PLAN_ROOT | Test command |
-|-----------|--------------|
-| `mind_api/.ai-factory` | `cd mind_api && npm test` |
-| `mind_mobile/.ai-factory` | `cd mind_mobile && flutter test` |
-| `.ai-factory` (root/cross) | Run both |
-
-Fallback for generic projects:
 
 | Detection | Command |
 |-----------|---------|

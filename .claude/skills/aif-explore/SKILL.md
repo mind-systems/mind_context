@@ -83,7 +83,8 @@ At the start, read these files if present:
 - `.ai-factory/DESCRIPTION.md` — project description, tech stack, constraints
 - `.ai-factory/ARCHITECTURE.md` — architecture decisions, folder structure
 - `.ai-factory/RULES.md` — project conventions and rules
-- `.ai-factory/plans/*.md` — active plans (fast or full mode)
+- `.ai-factory/PLAN.md` — active fast plan (if any)
+- `.ai-factory/plans/<branch>.md` — active full plans (if any)
 - `.ai-factory/ROADMAP.md` — strategic milestones (if any)
 
 This tells you:
@@ -112,7 +113,8 @@ Think freely. When insights crystallize, you might offer:
 If the user mentions a plan or you detect one is relevant:
 
 1. **Read existing plan for context**
-   - `.ai-factory/plans/<name>.md` (fast or full mode, pick most recently modified)
+   - `.ai-factory/PLAN.md` (fast mode)
+   - `.ai-factory/plans/<branch>.md` (full mode)
 
 2. **Reference it naturally in conversation**
    - "Your plan mentions adding Redis, but we just realized SQLite fits better..."

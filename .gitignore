@@ -1,6 +1,7 @@
 # Project subdirectories (separate repos)
 mind_api/
 mind_mobile/
+mind_mcp/
 
 # OS
 .DS_Store

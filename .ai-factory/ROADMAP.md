@@ -33,8 +33,15 @@
   - [x] Mobile I-3: Activity Integration (LiveSessionNotifier, ILiveSessionService, BreathSessionViewModel)
   - [x] Mobile I-4: Engine Telemetry (TelemetryBuffer, TelemetryService, phase streaming)
   - [x] Mobile I-5: Activity pause/resume wired end-to-end
-- [ ] **Session Statistics & Progress** — per-user breathing stats, streaks, progress tracking; built on top of the realtime foundation
-- [ ] **Push Notifications** — session reminders, streak alerts
+- [x] **Session Statistics & Progress** — per-user breathing stats, streaks, progress tracking; built on top of the realtime foundation
+- [ ] **Personal Access Tokens** `[API]` — create/revoke long-lived tokens for CLI/MCP access; `personal_access_tokens` table (hashed); accepted by JwtAuthGuard alongside regular JWTs; endpoints: `POST /auth/tokens`, `GET /auth/tokens`, `DELETE /auth/tokens/:id`
+- [ ] **Exercise Time-of-Day Field** `[API]` — add nullable `timeOfDay` enum column (`morning | midday | evening`) to `breath_sessions`; migration, entity, DTOs, seed values
+- [ ] **Suggestions Endpoint** `[API]` — `GET /breath_sessions/suggestions?timeOfDay=X`; returns random 3–4 of the user's sessions matching the requested time slot; client always sends morning/midday/evening (night maps to morning on the client side)
+- [ ] **Mind MCP Server — Core** `[MCP]` — standalone TypeScript MCP package (`mind_mcp/`); stdio transport; env-based auth (`MIND_API_URL` + `MIND_JWT_TOKEN`); tool: `list_my_breath_sessions`
+- [ ] **Mind MCP Server — AI Classification** `[MCP]` — tools: `classify_session_time_of_day` (Claude analyses description + phases, returns suggestion), `set_session_time_of_day` (PATCH API), `classify_all_sessions` (batch with confirmation)
+- [ ] **Personal Access Tokens** `[Mobile]` — "MCP" cell in Profile screen; new MCP screen: token list, create button, one-time reveal modal, revoke; see `mind_mobile/.ai-factory/notes/mcp-screen.md`
+- [ ] **Time-of-Day Suggestions Integration** `[Mobile]` — local time → morning/midday/evening helper; `fetchSuggestions` in IUserApi; Riverpod FutureProvider; widget wired to HomeScreen
+- [ ] **Time-of-Day Suggestions Widget UI** `[Mobile]` — thin-bordered card, randomized localized title, horizontal auto-scrolling carousel (reverses at ends, stops on user interaction); see `mind_mobile/.ai-factory/notes/suggestions-widget.md`
 
 ## Completed
 
@@ -63,3 +70,4 @@
 | Breath Session Complexity | 2026-03-13 |
 | JWT Session Management | 2026-03-13 |
 | Realtime Socket Foundation | 2026-03-15 |
+| Session Statistics & Progress | 2026-03-18 |

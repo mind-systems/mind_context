@@ -2,7 +2,7 @@
 
 ## Overview
 
-Mind is a wellness/breathing app consisting of a NestJS REST API backend and a Flutter mobile app (iOS/Android). Users authenticate via passwordless email (one-time code), perform guided breathing sessions, and the app persists session history both locally (Drift) and remotely (PostgreSQL).
+Mind is a wellness/breathing app consisting of a NestJS REST API backend, a Flutter mobile app (iOS/Android), and a static landing page. Users authenticate via passwordless email (one-time code), perform guided breathing sessions, and the app persists session history both locally (Drift) and remotely (PostgreSQL). The landing page serves as a public-facing entry point for the product.
 
 ## Core Features
 
@@ -10,6 +10,7 @@ Mind is a wellness/breathing app consisting of a NestJS REST API backend and a F
 - Guided breathing sessions with animated UI (shape morphing, physics-based motion)
 - Breathing session history — CRUD, pagination, local cache + remote sync
 - Offline-first: Drift (SQLite) local DB, synced to API on reconnect
+- Static landing page with Snake easter-egg (placeholder while real content is built)
 
 ## Tech Stack
 
@@ -29,6 +30,10 @@ Mind is a wellness/breathing app consisting of a NestJS REST API backend and a F
 - **Navigation:** GoRouter
 - **HTTP:** Dio + AuthInterceptor
 - **Flavors:** dev / prod
+
+### Landing (`mind_landing/`)
+- **Stack:** Plain HTML/CSS/JS — single `index.html`, no build step, no dependencies
+- **Current state:** Placeholder with a playable Snake game; real product content TBD
 
 ## Architecture Notes
 

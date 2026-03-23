@@ -4,7 +4,7 @@
 
 ## Project Overview
 
-Mind is a wellness/breathing app — NestJS REST API backend + Flutter mobile app. Users authenticate via Firebase, perform guided breathing sessions, and view session history synced between device and server.
+Mind is a wellness/breathing app — NestJS REST API backend + Flutter mobile app + static landing page. Users authenticate via passwordless email (one-time code), perform guided breathing sessions, and view session history synced between device and server.
 
 ## Tech Stack
 
@@ -12,7 +12,8 @@ Mind is a wellness/breathing app — NestJS REST API backend + Flutter mobile ap
 |-------|-------|
 | Backend | NestJS + TypeORM + PostgreSQL |
 | Mobile | Flutter + Riverpod + Drift |
-| Auth | Firebase (ID Token) → JWT (access) |
+| Landing | Plain HTML/CSS/JS (no build step) |
+| Auth | Passwordless email + one-time code → JWT |
 | Infra | Docker + Makefile |
 
 ## Project Structure
@@ -39,6 +40,10 @@ mind/
 │   │   └── Views/      # Shared UI components
 │   ├── docs/           # Architecture docs and Mermaid diagrams
 │   └── CLAUDE.md       # Mobile-specific agent instructions
+│
+├── mind_landing/       # Static landing page (HTML/CSS/JS, no build step)
+│   ├── index.html      # Single-file app — Snake placeholder, real content TBD
+│   └── CLAUDE.md       # Landing-specific agent instructions
 │
 ├── .ai-factory/        # AI agent context
 │   ├── DESCRIPTION.md  # Project specification
@@ -78,6 +83,7 @@ mind/
 | `.ai-factory/DESCRIPTION.md` | Project specification and tech stack |
 | `mind_api/CLAUDE.md` | Backend-specific instructions |
 | `mind_mobile/CLAUDE.md` | Mobile-specific instructions |
+| `mind_landing/CLAUDE.md` | Landing page instructions |
 
 ## Roadmap Context
 

@@ -2,6 +2,7 @@
 mind_api/
 mind_mobile/
 mind_mcp/
+mind_landing/
 
 # OS
 .DS_Store

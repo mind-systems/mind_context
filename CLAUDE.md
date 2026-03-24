@@ -73,6 +73,15 @@ Strip the sub-project prefix before processing the remaining argument (e.g. `api
 
 **All files must be written in English** — plans, roadmaps, DESCRIPTION.md, ARCHITECTURE.md, and any other generated or edited files. This applies regardless of the language used in conversation.
 
+## Proto contract ownership
+
+**`mind_api/proto/` is the single source of truth for all `.proto` files.**
+
+- No other project may create or modify `.proto` files.
+- Any contract change starts in `mind_api/proto/`, then each consumer (`mind_mcp`, `mind_mobile`) copies the updated files and regenerates stubs.
+- Do not use symlinks — they break when repos are cloned independently.
+- Change order: `mind_api/proto/` → implement in `mind_api` → copy proto to consumers → consumers regenerate and implement.
+
 ## Cross-project coordination
 
 When a task requires changes in **both** projects:

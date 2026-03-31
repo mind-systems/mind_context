@@ -3,26 +3,40 @@ name: detangle
 description: >-
   Raise full fractal context before answering any question or starting any task.
   Instead of analyzing a leaf in isolation, climbs the tree: leaf → branch (subdomain) →
-  trunk (domain) → forest (cross-project contracts). Use when a task touches a UI element,
-  a feature module, a data model, a transport contract, or any code whose meaning depends
-  on its position in the architecture. Especially critical for shared contracts (proto, API
-  shapes, DTOs) — raises context across all consuming trees simultaneously.
+  trunk (domain) → forest (cross-project contracts). Use when a task touches any code
+  element whose meaning depends on its position in the architecture. Especially critical
+  for shared contracts — raises context across all consuming trees simultaneously.
 argument-hint: "[topic or file or question]"
 ---
 
 # Detangle
 
 You are working in a fractal architecture. Every element — a file, a component, a model,
-a proto field — exists at a specific level of the tree. You cannot reason about it correctly
+a field — exists at a specific level of the tree. You cannot reason about it correctly
 without knowing its position in the full tree.
 
 **Architecture is a fractal:**
-- Leaf = usage surface (UI component, controller endpoint, CLI interface)
-- Branch = transport/reactive layer (HTTP, gRPC, WebSocket, state machine, ViewModel)
+- Leaf = usage surface (UI component, controller endpoint, CLI interface, entry point)
+- Branch = transport/reactive layer (HTTP, gRPC, WebSocket, state machine, pipeline stage, adapter)
 - Trunk = domain (state, invariants, business rules, persistence)
-- Forest = cross-project contracts (proto, shared DTOs, API shapes)
+- Forest = cross-project contracts (proto, shared DTOs, API shapes, schema, shared config)
 
 The same three roles repeat recursively at every zoom level.
+
+---
+
+## Before you start — load project context
+
+If `.ai-factory/DESCRIPTION.md` exists — read it. It tells you the tech stack, module
+boundaries, and architectural constraints. This is pre-documented knowledge; don't
+re-derive from code what's already written down.
+
+If `.ai-factory/ARCHITECTURE.md` exists — read it. It describes module communication
+patterns and where boundaries are intentionally drawn.
+
+If `.ai-factory/ROADMAP.md` exists — read it. It tells you what's already done and
+what's coming next. The element you're looking at may be part of an in-progress or
+planned milestone — that changes the impact analysis.
 
 ---
 
@@ -30,44 +44,58 @@ The same three roles repeat recursively at every zoom level.
 
 ### Step 1 — Identify the entry point
 
-From the argument `$1` (or conversation context if no argument), determine:
-- What is the **leaf** being discussed? (file, component, field, endpoint, UI element)
-- What project does it live in?
+From the argument `$ARGUMENTS` (or conversation context if no argument), determine:
+- What is the **leaf** being discussed? (file, function, class, field, endpoint, UI element)
+- What project or module does it live in?
 
 ### Step 2 — Climb the tree (leaf → trunk)
 
-Do NOT stay at the leaf level. Raise context level by level:
+Do NOT stay at the leaf level. Raise context level by level by **reading the code**:
 
 **Leaf level:**
 Read the file/component itself. Understand what it does on the surface.
 
 **Branch level (subdomain):**
-Ask: why does this leaf exist? What transport or reactive mechanism connects it to the domain?
-- For UI: which ViewModel/service/coordinator owns it? What state does it consume?
-- For an endpoint: which service/use-case does it delegate to?
-- For a model field: which layer uses it — persistence, transport, or presentation?
+Ask: why does this leaf exist? What connects it to the domain?
+- Follow imports and calls upward: who owns this? Who calls it?
+- What transport, reactive mechanism, or adapter sits between this leaf and the domain?
+- Is this a controller, a pipeline stage, a ViewModel, a service layer, a message handler?
 
 **Trunk level (domain):**
 Ask: what is the core invariant this leaf ultimately serves?
-- What state does the domain own?
-- What are the business rules enforced here?
-- Who else touches this domain?
+- What state does the domain own? Where is it persisted or held?
+- What are the business rules enforced at this level?
+- Who else in the codebase touches this same domain?
+
+Keep climbing until you can answer: **what is the trunk-level invariant this element exists to serve?**
 
 ### Step 3 — Check for cross-project reach (forest)
 
 Ask: does this element touch a shared boundary?
 
-**Triggers for forest-level context:**
-- The element is a proto field, message, or service → read the `.proto` file AND check all consumers (broker, core, mobile, mcp)
-- The element is an API response shape (DTO) → check both the API definition and every client that deserves it
-- The element is an auth token, session, or credential shape → check all services sharing the same secret/contract
-- The element is a database model that feeds a mobile cache (Drift) → check both ORM model and Dart model
+**Detect forest-level reach by looking for:**
+- Proto / schema / IDL files — any consumer in another project must be checked
+- Shared DTO or API response shapes imported by multiple projects
+- Auth tokens, session shapes, credential contracts used across services
+- Database schemas or models that mirror across services or platforms
+- Package manifests (Package.swift, pyproject.toml, go.mod) with shared dependencies
+- Any file explicitly named "contract", "interface", "protocol", "shared", or "common"
 
 When cross-project reach is detected: **read a slice of each affected tree**, not just the originating one.
 
 ### Step 4 — Synthesize
 
-Before answering or acting, produce a brief context map:
+Before answering or acting, produce a brief context map.
+
+If the element's position in the architecture is non-obvious, draw an ASCII tree first:
+
+```
+trunk: OrderDomain
+  └── branch: OrderService (HTTP layer)
+        └── leaf: POST /orders endpoint
+```
+
+Then produce the map:
 
 ```
 Leaf:    <what it is>
@@ -78,6 +106,10 @@ Forest:  <cross-project contracts affected, if any>
 Impact:  <what changes here, what else must move with it>
 ```
 
+**Intent:**
+- If you were invoked to **explain** (understand how something works) — Impact is optional.
+- If you were invoked to **act** (make a change, fix a bug, implement something) — Impact is mandatory. It drives what must move together with this change.
+
 This map is your reasoning foundation. Now answer the question or begin the task.
 
 ---
@@ -86,9 +118,8 @@ This map is your reasoning foundation. Now answer the question or begin the task
 
 - Never stop at 2-3 levels if the tree goes deeper.
 - Go as deep as the **flow requires** — not as deep as is easy.
-- If you hit a proto file: you are at the forest level. Read it and read its consumers.
-- If you hit a shared JWT secret or auth shape: you are at the forest level. Check all services.
-- If you hit a Drift table that mirrors an API response: you are at the forest level. Check both.
+- If you hit a shared contract file: you are at the forest level. Read all consumers.
+- If you cannot name the trunk-level invariant, you have not climbed high enough.
 
 ## What NOT to do
 
@@ -96,10 +127,3 @@ This map is your reasoning foundation. Now answer the question or begin the task
 - Do not assume you understand a component from its name alone.
 - Do not read only the originating project when a contract is shared.
 - Do not treat "it's just a UI change" as an excuse to skip the branch and trunk.
-
----
-
-## Reference
-
-See [references/FRACTAL-MODEL.md](references/FRACTAL-MODEL.md) for the full fractal model
-and project-specific tree maps.

@@ -9,19 +9,25 @@ Copy the prompt below and send it to Claude Code in this directory. It will clon
 ---
 
 ```
-Clone all Mind sub-repositories into the current directory.
+Clone the Mind monorepo and all sub-projects into the correct directory structure.
 
-Run the following commands one by one:
+Run these commands in order:
+1. git clone https://github.com/mind-systems/mind_context.git mind
+2. cd mind
+3. git clone https://github.com/mind-systems/mind-awake-api.git mind_api
+4. git clone https://github.com/mind-systems/mind_mobile.git mind_mobile
+5. git clone https://github.com/mind-systems/mind_landing.git mind_landing
+6. git clone https://github.com/mind-systems/mind_mcp.git mind_mcp
+7. git clone https://github.com/mind-systems/neiry_kit.git neiry_kit
 
-git clone https://github.com/mind-systems/mind-awake-api.git mind_api
-git clone https://github.com/mind-systems/mind_mobile.git mind_mobile
-git clone https://github.com/mind-systems/mind_landing.git mind_landing
-git clone https://github.com/mind-systems/mind_mcp.git mind_mcp
-git clone https://github.com/mind-systems/neiry_kit.git neiry_kit
+Directory structure must be preserved exactly — build scripts and proto schemas reference files via relative paths from the root.
 
-After cloning, confirm all five directories exist and show their contents.
-Then read CLAUDE.md in this root directory and in each sub-directory and
-summarize the project structure.
+After cloning, for each repository (root, mind_api, mind_mobile, mind_landing, mind_mcp, neiry_kit) find the most recently committed branch and switch to it:
+- Run `git branch -r --sort=-committerdate` to list remote branches by recency
+- Check out the top result (skip HEAD and main/master if a feature branch is more recent)
+- If the most recent branch is already main/master, stay on it
+
+After switching branches everywhere, read CLAUDE.md in the root and in each sub-project to understand the project structure and development workflow.
 ```
 
 ---

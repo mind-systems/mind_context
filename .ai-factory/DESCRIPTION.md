@@ -2,14 +2,15 @@
 
 ## Overview
 
-Mind is a wellness/breathing app consisting of a NestJS REST API backend, a Flutter mobile app (iOS/Android), a static landing page, an MCP server for Claude Code integration, and a Flutter plugin wrapping the Neiry neurofeedback hardware SDK. Users authenticate via passwordless email (one-time code), perform guided breathing sessions, and the app persists session history both locally (Drift) and remotely (PostgreSQL). The landing page serves as a public-facing entry point for the product.
+Mind is a wellness/breathing app consisting of a NestJS gRPC backend, a Flutter mobile app (iOS/Android), a static landing page, an MCP server for Claude Code integration, and a Flutter plugin wrapping the Neiry neurofeedback hardware SDK. Users authenticate via passwordless email (one-time code) or Google Sign-In, perform guided breathing sessions, and the app persists session history both locally (Drift) and remotely (PostgreSQL) with real-time sync over gRPC.
 
 ## Core Features
 
-- Passwordless email authentication (one-time code) with JWT session management
+- Passwordless email authentication (one-time code) and Google Sign-In with JWT session management
 - Guided breathing sessions with animated UI (shape morphing, physics-based motion)
 - Breathing session history — CRUD, pagination, local cache + remote sync
-- Offline-first: Drift (SQLite) local DB, synced to API on reconnect
+- Offline-first: Drift (SQLite) local DB, synced to API on reconnect via gRPC streaming
+- Real-time activity tracking: bidi-streaming gRPC session lifecycle + instruction stream
 - Static landing page with Snake easter-egg (placeholder while real content is built)
 
 ## Tech Stack
@@ -19,7 +20,8 @@ Mind is a wellness/breathing app consisting of a NestJS REST API backend, a Flut
 - **Framework:** NestJS
 - **Database:** PostgreSQL
 - **ORM:** TypeORM (migrations-based, synchronize: false)
-- **Auth:** Passwordless email + one-time code, Passport JWT (access token), JWT blacklist (PostgreSQL, purged nightly via cron)
+- **Transport:** gRPC (port 50051) via `@nestjs/microservices` + `@grpc/grpc-js`; single HTTP relay for Google OAuth browser callback
+- **Auth:** `GrpcAuthInterceptor` validates JWT + `user_sessions` table on every gRPC call; passwordless OTP (`rpc SendCode` + `rpc VerifyCode`); Google Sign-In (`rpc GoogleAuth`)
 - **Infra:** Docker (dev + prod), Makefile
 
 ### Mobile (`mind_mobile/`)
@@ -28,7 +30,7 @@ Mind is a wellness/breathing app consisting of a NestJS REST API backend, a Flut
 - **Local DB:** Drift (SQLite ORM, code-gen based)
 - **State:** Riverpod (presentation) + RxDart BehaviorSubject (domain)
 - **Navigation:** GoRouter
-- **HTTP:** Dio + AuthInterceptor
+- **Transport:** gRPC via `package:grpc` + `GrpcAuthInterceptor` (JWT in metadata)
 - **Flavors:** dev / prod
 
 ### Landing (`mind_landing/`)
@@ -49,19 +51,20 @@ Mind is a wellness/breathing app consisting of a NestJS REST API backend, a Flut
 ## Architecture Notes
 
 ### Backend
-Modular Monolith. Each domain (auth, breath-sessions, mail) is a self-contained NestJS feature module. Single-guard auth: `JwtAuthGuard` on all protected routes. Passwordless flow: user requests code → receives email → exchanges code for JWT. Controllers are thin — all logic in services.
+Modular Monolith. Each domain (auth, breath-sessions, realtime, sync) is a self-contained NestJS feature module. All API traffic goes through gRPC; `GrpcAuthInterceptor` is the single auth boundary. Controllers are thin — all logic in services.
 
 ### Mobile
-Layered architecture: Repository → Notifier (domain) → Service → ViewModel → Screen + Coordinator. ViewModel is the module boundary; domain models never leak into presentation. DI is manual via `App.shared` singleton.
+Layered architecture: Repository → Notifier (domain) → Service → ViewModel → Screen + Coordinator. ViewModel is the module boundary; domain models never leak into presentation. DI is manual via `App.shared` singleton. gRPC stubs generated from `mind_api/proto/`.
 
 ## Cross-project Coordination
 
-- API changes first (migrations → controller → service), then mobile client
-- DTO shapes must stay in sync: Dart models + Drift schema must match API responses
-- Auth changes affect both `mind_api/src/auth/` and `mind_mobile/lib/Core/Api/AuthInterceptor.dart` + `lib/User/`
+- Proto contract changes start in `mind_api/proto/` — single source of truth
+- After any proto change: implement in `mind_api` → copy `.proto` to consumers → consumers regenerate stubs
+- Dart models + Drift schema must match API proto contracts
+- Auth changes affect both `mind_api/src/users/` and `mind_mobile/lib/Core/Grpc/GrpcAuthInterceptor.dart`
 
 ## Non-Functional Requirements
 
-- Logging: NestJS built-in logger, configurable
-- Error handling: Structured HTTP errors on API, typed domain events on mobile
-- Security: JWT blacklist (PostgreSQL), HTTPS
+- Logging: Winston with daily rotation (API); structured domain events (mobile)
+- Error handling: gRPC status codes on API, typed domain events on mobile
+- Security: JWT validated on every gRPC call via `user_sessions` table; SHA-256 hashing for OTP codes and PATs

@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Deployment
+
+See [docs/deployment.md](docs/deployment.md) — server connection, deploy script, env files, ports.
+
 ## Repository structure
 
 This root repo is a coordination layer. All sub-directories below are **separate git repositories** (each has its own `.git` directory) that live inside it as subdirectories.

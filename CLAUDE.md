@@ -85,3 +85,4 @@ When a task requires changes in **both** projects:
 2. Implement API changes first (migrations → controller → service), then update the mobile client.
 3. The mobile app communicates with the API via gRPC (`lib/Core/Grpc/` — `GrpcClient`, `GrpcAuthInterceptor`); contract changes flow through proto regeneration (see Proto contract ownership). A thin HTTP layer (`lib/Core/Api/`) remains for PAT/Sync helpers — its DTO shapes and any Drift schema that caches them must be updated by hand when the API response shape changes.
 4. Auth token handling lives in `mind_api/src/users/` (auth module) and `mind_mobile/lib/Core/Grpc/GrpcAuthInterceptor.dart` + `lib/User/` — changes to the auth flow must be reflected in both.
+5. New REST read endpoints added for `mind_web` must include `@UseGuards(JwtAuthGuard)` and ownership checks scoped to the authenticated user.

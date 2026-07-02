@@ -14,12 +14,13 @@ This root repo is a coordination layer. All sub-directories below are **separate
 |-----------|-------|---------|
 | `mind_api/` | NestJS + TypeORM + PostgreSQL | Backend REST API — separate git repo |
 | `mind_mobile/` | Flutter + Riverpod + Drift | iOS/Android mobile app — separate git repo |
-| `mind_web/` | React + Vite + TypeScript + Recharts | Browser dashboard for historical session data — separate git repo |
+| `mind_web/` | React + Vite + TypeScript + ECharts | Browser dashboard for historical session data — separate git repo |
 | `mind_landing/` | Plain HTML/CSS/JS | Static landing page — separate git repo |
 | `mind_mcp/` | TypeScript + MCP stdio | MCP server for Claude Code — separate git repo |
 | `neiry_kit/` | Flutter plugin | Neiry neurofeedback SDK wrapper — separate git repo |
+| `camera_ppg_kit/` | Flutter plugin | Camera+torch contact-PPG heart-rate source — separate git repo; **not wired into root orchestration**, its planning stays local (see its `CLAUDE.md`) |
 
-**Git operations** (status, diff, commit, branch) must be run inside the respective subdirectory, not from the root. The root repo has no visibility into changes inside `mind_api/` or `mind_mobile/`.
+**Git operations** (status, diff, commit, branch) must be run inside the respective subdirectory, not from the root. The root repo has no visibility into changes inside the sub-repos.
 
 Read each sub-project's `CLAUDE.md` before working within it.
 
@@ -29,56 +30,40 @@ The root of this repo is a **coordination layer** — it holds cross-project pla
 
 ## Scope routing
 
-- Work scoped to the backend only → operate inside `mind_api/`, plans go to `mind_api/.ai-factory/`
-- Work scoped to the mobile app only → operate inside `mind_mobile/`, plans go to `mind_mobile/.ai-factory/`
-- Work scoped to the web dashboard → operate inside `mind_web/`, plans go to `mind_web/.ai-factory/`
-- Work scoped to MCP server → operate inside `mind_mcp/`, plans go to `mind_mcp/.ai-factory/`
-- Work scoped to the landing page → operate inside `mind_landing/`, plans go to `mind_landing/.ai-factory/`
-- Cross-project or architectural work → use the root `.ai-factory/`
+Work scoped to one sub-repo → operate inside it; its plans and roadmaps go to that repo's own `.ai-factory/`. Cross-project or architectural work → the root `.ai-factory/`. `camera_ppg_kit` is outside root orchestration — its planning stays local to that repo.
 
-### `/aif-plan` routing rules
+### Routing tables (from the root)
 
-When `/aif-plan` is run, first check the current working directory:
+| Argument prefix | Target |
+|---|---|
+| `api` | `mind_api/.ai-factory/` |
+| `mobile` | `mind_mobile/.ai-factory/` |
+| `web` | `mind_web/.ai-factory/` |
+| `mcp` | `mind_mcp/.ai-factory/` |
+| `landing` | `mind_landing/.ai-factory/` |
+| `neiry` | `neiry_kit/.ai-factory/` |
 
-- **CWD is inside a sub-project** (`mind_api/`, `mind_mobile/`, `mind_mcp/`, `mind_landing/`) → save plan to `.ai-factory/plans/` relative to CWD. No detection needed.
-- **CWD is the monorepo root** → detect target sub-project from the task description:
-
-| Keywords in description | Target | Plan path |
-|---|---|---|
-| NestJS, TypeORM, PostgreSQL, Swagger, Passport, migration, endpoint, controller, service | `mind_api` | `mind_api/.ai-factory/plans/` |
-| Flutter, Dart, Drift, Riverpod, widget, screen, GoRouter, Dio | `mind_mobile` | `mind_mobile/.ai-factory/plans/` |
-| React, Vite, Recharts, TailwindCSS, web dashboard, browser, LoginPage, SessionsPage | `mind_web` | `mind_web/.ai-factory/plans/` |
-| MCP, tool, stdio, classify, PAT, personal access token (server context) | `mind_mcp` | `mind_mcp/.ai-factory/plans/` |
-| landing, landing page, HTML, CSS, Snake, placeholder | `mind_landing` | `mind_landing/.ai-factory/plans/` |
-| architecture, roadmap, cross-project, or ambiguous | root | `.ai-factory/plans/` |
+| Keywords in description | Target |
+|---|---|
+| NestJS, TypeORM, PostgreSQL, migration, endpoint, controller, service, realtime, sync | `mind_api/.ai-factory/` |
+| Flutter, Dart, Drift, Riverpod, widget, screen, GoRouter, BCI screen, biometrics | `mind_mobile/.ai-factory/` |
+| React, Vite, ECharts, TailwindCSS, web dashboard, browser, LoginPage, SessionsPage | `mind_web/.ai-factory/` |
+| MCP, tool, stdio, classify, PAT, personal access token (server context) | `mind_mcp/.ai-factory/` |
+| landing, landing page, HTML, CSS, Snake, placeholder | `mind_landing/.ai-factory/` |
+| Neiry, Capsule, platform channel, EEG SDK, plugin native code | `neiry_kit/.ai-factory/` |
+| architecture, cross-project | root `.ai-factory/` |
 
 If detection is ambiguous, ask:
 ```
-Which sub-project is this plan for?
+Which sub-project is this for?
 1. mind_api (NestJS backend)
 2. mind_mobile (Flutter app)
 3. mind_web (React web dashboard)
 4. mind_mcp (MCP server)
 5. mind_landing (static landing page)
-6. Root / cross-project
+6. neiry_kit (Flutter BCI plugin)
+7. Root / cross-project
 ```
-
-### `/aif-roadmap` routing rules
-
-Default: works relative to CWD — no detection needed when already inside a sub-project.
-
-When run from the monorepo root, or when the user explicitly names a sub-project in the argument (e.g. `/aif-roadmap api` or `/aif-roadmap api check`):
-
-| Argument prefix | Target |
-|---|---|
-| `api` | `mind_api/.ai-factory/ROADMAP.md` |
-| `mobile` | `mind_mobile/.ai-factory/ROADMAP.md` |
-| `web` | `mind_web/.ai-factory/ROADMAP.md` |
-| `mcp` | `mind_mcp/.ai-factory/ROADMAP.md` |
-| `landing` | `mind_landing/.ai-factory/ROADMAP.md` |
-| no prefix / `check` / vision text | `.ai-factory/ROADMAP.md` relative to CWD |
-
-Strip the sub-project prefix before processing the remaining argument (e.g. `api check` → mode `check` for api).
 
 ## Language
 
@@ -98,5 +83,5 @@ Strip the sub-project prefix before processing the remaining argument (e.g. `api
 When a task requires changes in **both** projects:
 1. Create a task list covering both sides before implementing.
 2. Implement API changes first (migrations → controller → service), then update the mobile client.
-3. The mobile app communicates with the API via Dio (`lib/Core/Api/`). DTO shapes must stay in sync — changing an API response shape requires updating the corresponding Dart model and any Drift schema that caches it.
-4. Auth token handling lives in `mind_api/src/auth/` and `mind_mobile/lib/Core/Api/AuthInterceptor.dart` + `lib/User/` — changes to the auth flow must be reflected in both.
+3. The mobile app communicates with the API via gRPC (`lib/Core/Grpc/` — `GrpcClient`, `GrpcAuthInterceptor`); contract changes flow through proto regeneration (see Proto contract ownership). A thin HTTP layer (`lib/Core/Api/`) remains for PAT/Sync helpers — its DTO shapes and any Drift schema that caches them must be updated by hand when the API response shape changes.
+4. Auth token handling lives in `mind_api/src/users/` (auth module) and `mind_mobile/lib/Core/Grpc/GrpcAuthInterceptor.dart` + `lib/User/` — changes to the auth flow must be reflected in both.

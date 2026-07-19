@@ -26,7 +26,7 @@ Read each sub-project's `CLAUDE.md` before working within it.
 
 ## This repo is the orchestrator
 
-The root of this repo is a **coordination layer** — it holds cross-project plans, roadmaps, AI context (`.ai-factory/`), and skills (`.claude/`). It does not contain runnable application code itself.
+Holds cross-project plans, roadmaps, AI context (`.ai-factory/`), and skills (`.claude/`); no runnable application code lives at the root.
 
 ## Scope routing
 
@@ -67,7 +67,7 @@ Which sub-project is this for?
 
 ## Language
 
-**All files must be written in English** — plans, roadmaps, DESCRIPTION.md, ARCHITECTURE.md, and any other generated or edited files. This applies regardless of the language used in conversation.
+**All files must be written in English** — plans, roadmaps, ARCHITECTURE.md, and any other generated or edited files. This applies regardless of the language used in conversation.
 
 ## Proto contract ownership
 

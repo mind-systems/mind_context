@@ -2,9 +2,9 @@
 
 This repository is the coordination layer for the Mind project. It holds cross-project plans, roadmaps, and AI context. The application code lives in separate sub-repositories cloned inside this directory.
 
-## Onboarding a new developer
+## Setup
 
-Copy the prompt below and send it to Claude Code in this directory. It will clone all sub-repositories into the right places automatically.
+Copy the prompt below and send it to Claude Code in this directory. It will clone all sub-repositories into the right places automatically and switch each to its freshest branch.
 
 ---
 
@@ -20,10 +20,11 @@ Run these commands in order:
 6. git clone https://github.com/mind-systems/mind_mcp.git mind_mcp
 7. git clone https://github.com/mind-systems/neiry_kit.git neiry_kit
 8. git clone https://github.com/mind-systems/mind_web.git mind_web
+9. git clone https://github.com/mind-systems/camera_ppg_kit.git camera_ppg_kit
 
 Directory structure must be preserved exactly — build scripts and proto schemas reference files via relative paths from the root.
 
-After cloning, for each repository (root, mind_api, mind_mobile, mind_landing, mind_mcp, neiry_kit, mind_web) find the most recently committed branch and switch to it:
+After cloning, for each repository (root, mind_api, mind_mobile, mind_landing, mind_mcp, neiry_kit, mind_web, camera_ppg_kit) find the most recently committed branch and switch to it:
 - Run `git branch -r --sort=-committerdate` to list remote branches by recency
 - Check out the top result (skip HEAD and main/master if a feature branch is more recent)
 - If the most recent branch is already main/master, stay on it
@@ -33,7 +34,7 @@ After switching branches everywhere, read CLAUDE.md in the root and in each sub-
 
 ---
 
-## Sub-repositories
+### Sub-repositories
 
 | Directory | GitHub | Stack | Purpose |
 |-----------|--------|-------|---------|
@@ -43,8 +44,9 @@ After switching branches everywhere, read CLAUDE.md in the root and in each sub-
 | `mind_landing/` | [mind_landing](https://github.com/mind-systems/mind_landing) | Plain HTML/CSS/JS | Static landing page |
 | `mind_mcp/` | [mind_mcp](https://github.com/mind-systems/mind_mcp) | TypeScript + MCP stdio | MCP server for Claude Code |
 | `neiry_kit/` | [neiry_kit](https://github.com/mind-systems/neiry_kit) | Flutter plugin | Neiry neurofeedback SDK wrapper |
+| `camera_ppg_kit/` | [camera_ppg_kit](https://github.com/mind-systems/camera_ppg_kit) | Flutter plugin | Camera+torch contact-PPG heart-rate source (not wired into root orchestration) |
 
-## Repository layout
+### Repository layout
 
 ```
 mind_context/          ← you are here (coordination layer)
@@ -55,7 +57,8 @@ mind_context/          ← you are here (coordination layer)
 ├── mind_web/          — browser dashboard (separate git repo)
 ├── mind_landing/      — landing page (separate git repo)
 ├── mind_mcp/          — MCP server (separate git repo)
-└── neiry_kit/         — Flutter plugin (separate git repo)
+├── neiry_kit/         — Flutter plugin (separate git repo)
+└── camera_ppg_kit/    — Flutter plugin, camera-PPG heart rate (separate git repo)
 ```
 
 Each sub-directory is an independent git repository. Run `git` commands from inside the sub-directory, not from the root.
